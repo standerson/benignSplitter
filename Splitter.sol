@@ -4,7 +4,7 @@ contract Splitter {
 
 	address owner;
 	bool isActive = true;
-	
+
 	modifier onlyActive () {
 		require (isActive == true);
 		_;
@@ -29,7 +29,9 @@ contract Splitter {
 			if (i == numRecipients - 1){
 				splitAmount += remainder; 
 			}
-			recipients[i].transfer(splitAmount); 
+			if(!recipients[i].transfer(splitAmount)){
+				throw;
+				} 
 		}
 		
 		
