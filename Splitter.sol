@@ -9,41 +9,41 @@ contract Splitter {
 		require (isActive == true);
 		_;
 	}
-	function Splitter() {
+	function Splitter() public {
 
 		owner = msg.sender;  
 	}
 
-	function onlyActive splitFunds(address[] _recipients) payable {
+	function  splitFunds(address[] _recipients) payable onlyActive public {
 
-		uint numRecipients = recipients.length;
+		uint numRecipients = _recipients.length;
 		uint splitAmount = msg.value / numRecipients;
 		uint remainder = msg.value - (splitAmount * numRecipients);
 		
 		
 		if(msg.gas<(numRecipients*21000)||numRecipients<2){
-			throw;
+			revert();
 		}
 		
 		for (uint i=0; i<numRecipients; i++){
 			if (i == numRecipients - 1){
 				splitAmount += remainder; 
 			}
-			if(!recipients[i].transfer(splitAmount)){
-				throw;
+			if(!_recipients[i].send(splitAmount)){
+					revert();
 				} 
 		}
 		
 		
 	}
 
-	function destroy() {
+	function destroy() public {
 		if (msg.sender == owner) {
 			isActive = false;
 		}
 	}
 
-	function resurrect() {
+	function resurrect() public {
 		if (msg.sender == owner) {
 			isActive = true;
 		}
