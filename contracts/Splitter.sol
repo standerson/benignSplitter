@@ -2,7 +2,7 @@ pragma solidity ^0.4.8;
 
 // A contract that is desinged for the owner 2 get rich one wei at a time
 // 
-//import 'SafeMath.sol';
+import './SafeMath.sol';
 
 contract Splitter {
 
