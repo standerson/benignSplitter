@@ -1,52 +1,58 @@
 pragma solidity ^0.4.8;
 
+// A contract that is desinged for the owner 2 get rich one wei at a time
+// 
+import '/SafeMath.sol';
+
 contract Splitter {
 
+
 	
-	public bool isActive = true;
+	public bool isActive;
+	mapping (address => uint256) balances;
 
 	modifier onlyActive () {
 		require (isActive);
 		_;
 	}
+
 	function Splitter() {
-
-		
+		owner = msg.sender;
+		Activate(block.timestamp, msg.sender);
 	}
 
-	function onlyActive splitFunds(address[] _recipients) payable {
-
-		uint numRecipients = recipients.length;
-		uint splitAmount = msg.value / numRecipients;
-		uint remainder = msg.value - (splitAmount * numRecipients);
-		
-		
-		if(msg.gas<(numRecipients*21000)||numRecipients<2){
-			throw;
-		}
-		
-		for (uint i=0; i<numRecipients; i++){
-			if (i == numRecipients - 1){
-				splitAmount += remainder; 
-			}
-			if(!recipients[i].transfer(splitAmount)){
-				throw;
-				} 
-		}
-		
+	function onlyActive splitFunds(address _recipient1, address _recipient2) payable {
+		balances[_recipient1] += balances[_recipient1];
+		balances[_recipient2] += balances[_recipient2];
+		Split(_recipient1, _recipient2, msg.value);
 	}
 
-	function destroy() {
-		if (msg.sender == owner) {
-			isActive = false;
-		}
+	
+	function withdrawAll (address _recipient) {  
+	    require( balances[_recipient] > 0);
+	    uint value	= balances[_recipient]
+	    balances[_recipient] = 0;
+	    _recipient.transfer(value);
+	    WithdrawAll(_recipient, value);
+	    
 	}
 
-	function resurrect() {
-		if (msg.sender == owner) {
-			isActive = true;
-		}
+	function Deactivate() {
+		require (msg.sender == owner) ;
+		isActive = false;
+		Deactivated(block.timestamp, msg.sender);
+	}
+
+	function Activate() {
+		require(msg.sender == owner) ;
+		isActive = true;
+		Activated(block.timestamp, msg.sender)
+		
 	}
 	
+	event Activated(uint indexed _time, address _actor);
+	event Deactivated(uint indexed _time, address _actor);
+	event Split(address _recipient1, address _recipient2, uint _value);
+	event WithdrawAll(address _recipient, uint _value);
 	
 }
