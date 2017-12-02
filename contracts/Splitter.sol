@@ -2,13 +2,12 @@ pragma solidity ^0.4.8;
 
 // A contract that is desinged for the owner 2 get rich one wei at a time
 // 
-import '/SafeMath.sol';
+//import 'SafeMath.sol';
 
 contract Splitter {
 
-
-	
-	public bool isActive;
+	bool public isActive;
+	address public owner;
 	mapping (address => uint256) balances;
 
 	modifier onlyActive () {
@@ -18,35 +17,35 @@ contract Splitter {
 
 	function Splitter() {
 		owner = msg.sender;
-		Activate(block.timestamp, msg.sender);
+		activate();
 	}
 
-	function onlyActive splitFunds(address _recipient1, address _recipient2) payable {
-		balances[_recipient1] += balances[_recipient1];
-		balances[_recipient2] += balances[_recipient2];
+	function splitFunds(address _recipient1, address _recipient2)  payable onlyActive {
+		balances[_recipient1] = balances[_recipient1] + msg.value/2;
+		balances[_recipient2] = balances[_recipient2] + msg.value/2;
 		Split(_recipient1, _recipient2, msg.value);
 	}
 
 	
 	function withdrawAll (address _recipient) {  
 	    require( balances[_recipient] > 0);
-	    uint value	= balances[_recipient]
+	    uint value	= balances[_recipient];
 	    balances[_recipient] = 0;
 	    _recipient.transfer(value);
 	    WithdrawAll(_recipient, value);
 	    
 	}
 
-	function Deactivate() {
+	function deactivate() {
 		require (msg.sender == owner) ;
 		isActive = false;
 		Deactivated(block.timestamp, msg.sender);
 	}
 
-	function Activate() {
+	function activate() {
 		require(msg.sender == owner) ;
 		isActive = true;
-		Activated(block.timestamp, msg.sender)
+		Activated(block.timestamp, msg.sender);
 		
 	}
 	
